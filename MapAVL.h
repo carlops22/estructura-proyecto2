@@ -10,7 +10,14 @@ using namespace std;
 class MapAVL: public ADTMap{
 
 	private:
-		vector<pair<string,int>> _array;
+		struct nodo{
+			nodo *padre;
+			nodo *izq, *der;
+			int altura;
+			int balance;
+			nodo(pair<string,int> &pair, nodo &p, nodo &i, nodo &d);
+			void update_balance();
+		}
 	public:
 	
 		MapAVL();
