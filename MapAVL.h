@@ -16,11 +16,14 @@ class MapAVL: public ADTMap{
 
 	private:
 		nodo *raiz;	
+		int numNodos;
+		ptrnodo insert_nodo(ptrnodo nodio,pair<string,int> &pair);
 		void init_nodo(ptrnodo nodio,pair<string,int> &pair);
 		void preOrder(ptrnodo nodio);
 		void inOrder(ptrnodo nodio);
-		void postOrder(ptrnodo nodio);
+		void postOrder_delete_nodo(ptrnodo nodio);
 		ptrnodo bin_searchtree(ptrnodo nodio, string key);
+		ptrnodo delete_nodo(ptrnodo nodio);
 		ptrnodo delete_nodo(ptrnodo nodio, string key);
 		void update_balance(ptrnodo nodio);
 		void rebalance(ptrnodo nodio);

@@ -1,29 +1,59 @@
 #include "MapAVL.h"
 #include <algorithm>
 MapAVL::MapAVL(){
-	raiz=nullptr;
+	raiz=nullptr; //inicializa la raiz
+	numNodos=0;  //inicializa contador de nodos
 }
 
 MapAVL::~MapAVL(){
-	
+	postOrder_delete_nodo(raiz); //se hace un delete recorriendo en post order desde la raiz
 }
+//funcion para inicializar un nodo, con sus punteros nulos
 void MapAVL::init_nodo(ptrnodo nodio,pair<string,int> &pair){
 			nodio->par=pair;
 			nodio->padre=nullptr;
 			nodio->izq=nullptr;
 			nodio->der=nullptr;
 			nodio->balance=0;
-		}
+}
+
+//funcion para insertar nodo
+ptrnodo MapAVL::insert_nodo(ptrnodo base,pair<string,int> &pair){
+	//caso 1: se inicializa el nodo base
+	if(!base){
+	
+		init_nodo(base,pair);
+		return base;
+	}
+	else{
+		//caso 2: si la llave a insertar es menor al del nodo base, se inserta en la rama izquierda
+		if(pair.first<base->par.first)
+			base->izq=insert_nodo(base->izq,pair);
+		//caso 3: si la llave a insertar es mayor al del nodo base, se inserta en la rama derecha
+		else if(pair.first>base->par.first)
+			base->der=insert_nodo(base->der,pair);
+		//caso 4: si ya existe la llave, solo retorna el nodo
+		else
+			return base;
+	}
+
+	//se actualiza el balance
+	update_balance(base);
+	
+	return base;
+}		
 		
 //funcion de busqueda binaria de arbol, busca una llave desde cierto nodo hacia abajo
 ptrnodo MapAVL::bin_searchtree(ptrnodo nodio, string key){
+	//caso 1: el nodo no existe o encontro llave
 		if (nodio == nullptr || key == nodio->par.first) {
 			return nodio;
 		}
-
+	//caso 2: la llave es menor al del nodio, se recorre por la rama izquierda
 		if (key < nodio->par.first) {
 			return bin_searchtree(nodio->izq, key);
 		} 
+	//caso 3: la llave es mayor al del nodio, se recorre por la rama derecha
 		return bin_searchtree(nodio->der, key);
 }
 
@@ -34,6 +64,11 @@ ptrnodo MapAVL::min_node(ptrnodo nodio){
 	return nodio;
 }
 //funcion para eliminar nodo
+ptrnodo MapAVL::delete_nodo(ptrnodo nodio){
+	nodio->izq=nullptr;
+	nodio->der=nullptr;
+	return nodio;
+}
 ptrnodo MapAVL::delete_nodo(ptrnodo nodio, string key){
 	// busca la llave, traversando el arbol
 	if(nodio==nullptr)
@@ -71,9 +106,7 @@ ptrnodo MapAVL::delete_nodo(ptrnodo nodio, string key){
 			nodio->der= delete_nodo(nodio->der,temp->par.first);
 		}
 	}
-	
-	//ahora se updatea el balance de los nodos, piko idea :) 
-	
+	update_balance(nodio);
 	
 	return nodio;
 }
@@ -191,22 +224,43 @@ void MapAVL::rebalance(ptrnodo nodio){
 		
 	
 }
+//funcion para eliminar nodos en postorder
+void MapAVL::postOrder_delete_nodo(ptrnodo nodio){
+	if(nodio == nullptr) return;
+	postOrder_delete_nodo(nodio->izq);
+	postOrder_delete_nodo(nodio->der);
+	delete_nodo(nodio);
+
+}
+
 void MapAVL::insert(pair<string,int> pair){
-	
+	raiz=insert_nodo(raiz,pair); //funcion para insertar nuevos nodos
+	numNodos++; //aumenta contador
 }
 
 void MapAVL::erase(string key){
-	
+	ptrnodo nodo=raiz;
+	ptrnodo buscar=bin_searchtree(raiz,key);
+	//si existe el nodo con dicha llave se elimina el nodo
+	if(!buscar){ 
+		delete_nodo(nodo,key);
+		numNodos--;
+	}
 }
 
 int MapAVL::at(string key){
-	
+	ptrnodo nodo=bin_searchtree(raiz,key);
+	if(!nodo) return -1;
+	return nodo->par.second;
 }
 
 int MapAVL::size(){
-	
+	return numNodos;
 }
 
 bool MapAVL::empty(){
-	
+	bool r=false;
+	if(!numNodos)
+		r=true;
+	return r;
 }	

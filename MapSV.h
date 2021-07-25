@@ -10,7 +10,7 @@ using namespace std;
 class MapSV: public ADTMap{
 
 	private:
-		vector<pair<string,int>> _array;
+		vector<pair<string,int> > _array;
 		int binBusqueda(string, int, int);
 		int tam;
 	public:
