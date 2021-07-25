@@ -9,7 +9,7 @@ MapAVL::~MapAVL(){
 	postOrder_delete_nodo(raiz); //se hace un delete recorriendo en post order desde la raiz
 }
 //funcion para inicializar un nodo, con sus punteros nulos
-void MapAVL::init_nodo(ptrnodo nodio,pair<string,int> &pair){
+void MapAVL::init_nodo(ptrnodo nodio,pair<string,int> pair){
 			nodio->par=pair;
 			nodio->padre=nullptr;
 			nodio->izq=nullptr;
@@ -17,32 +17,7 @@ void MapAVL::init_nodo(ptrnodo nodio,pair<string,int> &pair){
 			nodio->balance=0;
 }
 
-//funcion para insertar nodo
-ptrnodo MapAVL::insert_nodo(ptrnodo base,pair<string,int> &pair){
-	//caso 1: se inicializa el nodo base
-	if(!base){
-	
-		init_nodo(base,pair);
-		return base;
-	}
-	else{
-		//caso 2: si la llave a insertar es menor al del nodo base, se inserta en la rama izquierda
-		if(pair.first<base->par.first)
-			base->izq=insert_nodo(base->izq,pair);
-		//caso 3: si la llave a insertar es mayor al del nodo base, se inserta en la rama derecha
-		else if(pair.first>base->par.first)
-			base->der=insert_nodo(base->der,pair);
-		//caso 4: si ya existe la llave, solo retorna el nodo
-		else
-			return base;
-	}
 
-	//se actualiza el balance
-	update_balance(base);
-	
-	return base;
-}		
-		
 //funcion de busqueda binaria de arbol, busca una llave desde cierto nodo hacia abajo
 ptrnodo MapAVL::bin_searchtree(ptrnodo nodio, string key){
 	//caso 1: el nodo no existe o encontro llave
@@ -69,6 +44,7 @@ ptrnodo MapAVL::delete_nodo(ptrnodo nodio){
 	nodio->der=nullptr;
 	return nodio;
 }
+
 ptrnodo MapAVL::delete_nodo(ptrnodo nodio, string key){
 	// busca la llave, traversando el arbol
 	if(nodio==nullptr)
@@ -77,36 +53,67 @@ ptrnodo MapAVL::delete_nodo(ptrnodo nodio, string key){
 		nodio->izq=delete_nodo(nodio->izq,key);
 	else if(key>nodio->par.first)
 		nodio->der=delete_nodo(nodio->der,key);
-	
 	//encontro la llave, basta borrarlo
 	else{ 
 		//caso 1: nodo es hoja
 		if(nodio->izq==nullptr && nodio->der==nullptr){
 			delete nodio;
 			nodio=nullptr;
+			return nodio;
 		}
 		
 		//caso 2: nodo tiene un solo hijo
 		else if(nodio->izq== nullptr){
-			nodo *temp=nodio;
+			ptrnodo temp=nodio;
 			nodio=nodio->der;
 			delete temp;
+			return nodio;
 		}
 		
 		else if(nodio->der== nullptr){
-			nodo *temp=nodio;
+			ptrnodo temp=nodio;
 			nodio=nodio->izq;
 			delete temp;
+			return nodio;
 		}
 		
 		//caso 3: tiene ambos hijos (izquierda,derecha)
 		else{
-			nodo *temp=min_node(nodio->der);
+			ptrnodo temp=min_node(nodio->der);
 			nodio->par=temp->par;
 			nodio->der= delete_nodo(nodio->der,temp->par.first);
 		}
 	}
-	update_balance(nodio);
+	
+	if (nodio == nullptr)
+    	return nodio;
+    // si se desbalancea hay que realizar 4 tipos de rotaciones
+ 
+    // izquierda izquierda
+    if (nodio->balance > 1 &&
+        nodio->izq->balance >= 0)
+        derRotar(nodio);
+ 
+    // izquierda derecha
+    if (nodio->balance > 1 &&
+        nodio->izq->balance < 0)
+    {
+        izqRotar(nodio->izq);
+        derRotar(nodio);
+    }
+ 
+    // derecha derecha
+    if (nodio->balance < -1 &&
+        nodio->der->balance <= 0)
+        izqRotar(nodio);
+ 
+    // derecha izquierda
+    if (nodio->balance < -1 &&
+        nodio->der->balance > 0)
+    {
+        derRotar(nodio->der);
+        izqRotar(nodio);
+    }
 	
 	return nodio;
 }
@@ -198,7 +205,7 @@ void MapAVL::update_balance(ptrnodo nodio){
 }
 void MapAVL::rebalance(ptrnodo nodio){
 	//balance del nodo 1 o mayor
-	if(nodio->balance>0){
+	if(nodio->balance>1){
 		//caso 1: rotacion por zigzag hacia la derecha, se rota el nodo hijo a la derecha y luego el nodo a la izq
 		if(nodio->der->balance<0){
 			derRotar(nodio->der);
@@ -209,7 +216,7 @@ void MapAVL::rebalance(ptrnodo nodio){
 			izqRotar(nodio);
 	}
 	//balance es -1 o menor
-	else if(nodio->balance<0){
+	else if(nodio->balance<-1){
 		//caso 3: rotacion por zigzag hacia la izquierda, se rota el nodo hijo a la izquierda y luego el nodo a la der
 		if(nodio->izq->balance>0){
 			izqRotar(nodio->izq);
@@ -234,18 +241,45 @@ void MapAVL::postOrder_delete_nodo(ptrnodo nodio){
 }
 
 void MapAVL::insert(pair<string,int> pair){
-	raiz=insert_nodo(raiz,pair); //funcion para insertar nuevos nodos
+	
+	ptrnodo nodio= new nodo;
+	init_nodo(nodio,pair);
+
+	ptrnodo x=this->raiz; //puntero auxiliar para recorrer arbol
+	ptrnodo y=nullptr;
+	//recorre hasta encontrar una posicion vacia
+	while(x!=nullptr){
+		y=x;
+		//caso 1: si es la llave es menor recorre hacia la izquierda
+		if(nodio->par.first<x->par.first)
+			x=x->izq;
+		//caso 2: recorre a la derecha
+		else
+			x=x->der;
+	}
+	//y es el padre de x
+	nodio->padre=y;
+	//si y sigue siendo nullptr es pq nodio es le primer elemento del arbol
+	if(y==nullptr)
+		raiz=nodio;
+	//si la llave es menor a  la de y se posiciona a su izquierda
+	else if(nodio->par.first<y->par.first)
+		y->izq=nodio;
+
+	//de lo contrario a la derecha
+	else 
+		y->der=nodio;
+
+	
+	update_balance(nodio);
 	numNodos++; //aumenta contador
 }
 
 void MapAVL::erase(string key){
-	ptrnodo nodo=raiz;
-	ptrnodo buscar=bin_searchtree(raiz,key);
-	//si existe el nodo con dicha llave se elimina el nodo
-	if(!buscar){ 
-		delete_nodo(nodo,key);
-		numNodos--;
-	}
+	ptrnodo temp=raiz;
+	temp=delete_nodo(raiz,key);
+	numNodos--;
+	
 }
 
 int MapAVL::at(string key){

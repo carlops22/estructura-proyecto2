@@ -10,6 +10,7 @@ struct nodo{
 			nodo *izq, *der;
 			pair<string,int> par;
 			int balance; //factor de balance, si esta balanceado es 0
+			int altura;
 };
 typedef nodo *ptrnodo;
 class MapAVL: public ADTMap{
@@ -17,11 +18,11 @@ class MapAVL: public ADTMap{
 	private:
 		nodo *raiz;	
 		int numNodos;
-		ptrnodo insert_nodo(ptrnodo nodio,pair<string,int> &pair);
-		void init_nodo(ptrnodo nodio,pair<string,int> &pair);
-		void preOrder(ptrnodo nodio);
-		void inOrder(ptrnodo nodio);
+		void init_nodo(ptrnodo nodio,pair<string,int> pair);
 		void postOrder_delete_nodo(ptrnodo nodio);
+		int cAltura(ptrnodo nodio);
+		int getAltura(ptrnodo nodio);
+		int getBalance(ptrnodo nodio);
 		ptrnodo bin_searchtree(ptrnodo nodio, string key);
 		ptrnodo delete_nodo(ptrnodo nodio);
 		ptrnodo delete_nodo(ptrnodo nodio, string key);
