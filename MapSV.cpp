@@ -53,6 +53,10 @@ void MapSV::erase(string s){
 }
 int MapSV::at(string s){
 	int indice=binBusqueda(s,0,tam-1);
+	if(indice==-1){
+		cout<<"No se encontro llave"<<endl;
+		return -1;
+	}
 	return _array[indice].second;
 	
 }
