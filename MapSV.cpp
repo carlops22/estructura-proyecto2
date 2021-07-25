@@ -52,8 +52,8 @@ void MapSV::erase(string s){
 		_array.erase(_array.begin()+r);
 }
 int MapSV::at(string s){
-	
-	return binBusqueda(s,0,tam-1);
+	int indice=binBusqueda(s,0,tam-1);
+	return _array[indice].second;
 	
 }
 int MapSV::size(){
