@@ -45,8 +45,9 @@ ptrnodo MapAVL::delete_nodo(ptrnodo nodio){
 	return nodio;
 }
 
+//funcion principal para eliminar un nodo
 ptrnodo MapAVL::delete_nodo(ptrnodo nodio, string key){
-	// busca la llave, traversando el arbol
+	// busca la llave, atravesando el arbol
 	if(nodio==nullptr)
 		return nodio;
 	else if(key<nodio->par.first)
@@ -117,7 +118,7 @@ ptrnodo MapAVL::delete_nodo(ptrnodo nodio, string key){
 	
 	return nodio;
 }
-
+//funcion para rotar a la derecha un nodo
 void MapAVL::derRotar(ptrnodo nodio){
 	
 	ptrnodo nodo= nodio->izq;
@@ -147,7 +148,7 @@ void MapAVL::derRotar(ptrnodo nodio){
 	nodio->balance=nodio->balance+1-min(0,nodo->balance);
 	nodo->balance=nodo->balance+1+max(0,nodio->balance);
 }
-
+//funcion para rotar a la izquierda de un determinado nodo
 void MapAVL::izqRotar(ptrnodo nodio){
 	ptrnodo nodo=nodio->der;
 	nodio->der=nodo->izq;
@@ -178,7 +179,7 @@ void MapAVL::izqRotar(ptrnodo nodio){
 	
 	
 }
-
+//funcion para mantener actualizada el balance
 void MapAVL::update_balance(ptrnodo nodio){
 	
 	//caso 1: el nodo esta desbalanceado, se prosigue a equilibrar el arbol
@@ -274,24 +275,24 @@ void MapAVL::insert(pair<string,int> pair){
 	update_balance(nodio);
 	numNodos++; //aumenta contador
 }
-
+//ejecuta delete_nodo que se encarga de eliminar el nodo a buscar con la llave
 void MapAVL::erase(string key){
 	ptrnodo temp=raiz;
 	temp=delete_nodo(raiz,key);
 	numNodos--;
 	
 }
-
+//realiza la busqueda en arbol binario
 int MapAVL::at(string key){
 	ptrnodo nodo=bin_searchtree(raiz,key);
 	if(!nodo) return -1;
 	return nodo->par.second;
 }
-
+//retorna el tamaño del map
 int MapAVL::size(){
 	return numNodos;
 }
-
+//retorna si esta vacio o no el map
 bool MapAVL::empty(){
 	bool r=false;
 	if(!numNodos)

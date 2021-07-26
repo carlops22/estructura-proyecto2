@@ -20,9 +20,6 @@ class MapAVL: public ADTMap{
 		int numNodos;
 		void init_nodo(ptrnodo nodio,pair<string,int> pair);
 		void postOrder_delete_nodo(ptrnodo nodio);
-		int cAltura(ptrnodo nodio);
-		int getAltura(ptrnodo nodio);
-		int getBalance(ptrnodo nodio);
 		ptrnodo bin_searchtree(ptrnodo nodio, string key);
 		ptrnodo delete_nodo(ptrnodo nodio);
 		ptrnodo delete_nodo(ptrnodo nodio, string key);
